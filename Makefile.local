@@ -1,0 +1,9 @@
+# golines is the one gate tool that walks every .go file under the repo,
+# including testdata fixtures, which the rest of the gate (go vet, golangci,
+# staticcheck, coverage) already skips by Go convention.
+# testdata/src/m/internal/domain/hollow/broken.go is INTENTIONALLY unparseable
+# (the analyzer must reject a counterpart directory whose only Go-suffixed file
+# has no parseable package clause), so golines must skip testdata like every
+# other tool. Setting --ignored-dirs replaces the built-in default list, so the
+# defaults (vendor, node_modules, .git) are restated alongside testdata.
+GOLINES = $(gobin-or-die)/golines --ignored-dirs=vendor --ignored-dirs=node_modules --ignored-dirs=.git --ignored-dirs=testdata

@@ -53,3 +53,23 @@ func TestRunResolvesCounterpartThroughSeam(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, *messages, 1)
 }
+
+// TestRunSkipsNestedSubpackages proves the correspondence requirement applies
+// only at the direct <cmd> segment: a package nested beneath a command or a
+// domain package carries no counterpart requirement of its own, so even with
+// every counterpart reported missing it must stay silent.
+func TestRunSkipsNestedSubpackages(t *testing.T) {
+	original := hasPackage
+	t.Cleanup(func() { hasPackage = original })
+	hasPackage = func(pkgDir) bool { return false }
+
+	for _, filename := range []string{
+		"/m/internal/app/commands/greet/flags/flags.go",
+		"/m/internal/domain/greet/deep/deep.go",
+	} {
+		pass, messages := parsePass(t, filename, "package p")
+		_, err := run(pass)
+		require.NoError(t, err)
+		assert.Empty(t, *messages, filename)
+	}
+}
