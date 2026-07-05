@@ -86,9 +86,12 @@ func counterpartOf(dir pkgDir) (pkgDir, string, bool) {
 	return "", "", false
 }
 
+// treeSegment is one of the three-tier layout's marker path segments.
+type treeSegment string
+
 // isDirectChild reports whether dir is exactly one path segment below segment,
 // i.e. the <cmd> directory itself rather than a nested subpackage of it.
-func isDirectChild(dir pkgDir, segment string) bool {
-	_, rest, found := strings.Cut(string(dir), segment)
+func isDirectChild(dir pkgDir, segment treeSegment) bool {
+	_, rest, found := strings.Cut(string(dir), string(segment))
 	return found && rest != "" && !strings.Contains(rest, "/")
 }
